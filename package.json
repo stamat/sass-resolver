@@ -1,16 +1,18 @@
 {
   "name": "sass-resolver",
-  "description": "A custom resolver for dart-sass with support for include paths",
+  "description": "A custom FileImporter for Dart Sass that adds include path resolution, similar to the deprecated includePaths option.",
   "version": "1.0.0",
   "license": "MIT",
   "type": "module",
   "main": "sass-resolver.js",
+  "types": "sass-resolver.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stamat/sass-resolver.git"
   },
   "files": [
-    "sass-resolver.js"
+    "sass-resolver.js",
+    "sass-resolver.d.ts"
   ],
   "author": "Stamat <@stamat> (http://stamat.info)",
   "homepage": "https://github.com/stamat/sass-resolver",
@@ -20,11 +22,15 @@
     "resolver",
     "importer",
     "dart-sass",
-    "path-resolver"
+    "path-resolver",
+    "file-importer"
   ],
   "scripts": {
     "lint": "eslint ./sass-resolver.js",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
+  },
+  "peerDependencies": {
+    "sass": "^1.45.0"
   },
   "devDependencies": {
     "@jest/globals": "^30.2.0",

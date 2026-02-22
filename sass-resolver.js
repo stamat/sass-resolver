@@ -4,14 +4,30 @@ import { pathToFileURL } from 'node:url'
 
 const STYLE_EXTENSIONS = ['sass', 'scss', 'css']
 
+/**
+ * Checks if a file exists at the given path.
+ * @param {...string} pathSegments The segments of the path to check.
+ * @returns {boolean} True if the file exists, false otherwise.
+ */
 export function pathExists() {
   return fs.existsSync(path.join(...arguments))
 }
 
+/**
+ * Checks if the given path is a directory.
+ * @param {...string} pathSegments The segments of the path to check.
+ * @returns {boolean} True if the path exists and is a directory, false otherwise.
+ */
 export function pathIsDirectory() {
   return fs.lstatSync(path.join(...arguments)).isDirectory()
 }
 
+/**
+ * Checks if a file exists with the given path, trying different extensions and underscored versions.
+ * @param {string} filePath The base file path to check, e.g. `src/styles/main`.
+ * @param {string[]} extensions An array of extensions to try, e.g. `['sass', 'scss', 'css']`.
+ * @returns {string|null} The full path to the existing file if found, or null if not found.
+ */
 export function tryToFindFile(filePath, extensions) {
   const pathParts = path.parse(filePath)
   if (pathParts.ext && pathParts.ext.length > 0 && extensions.includes(pathParts.ext.slice(1))) {
@@ -32,6 +48,11 @@ export function tryToFindFile(filePath, extensions) {
   return null
 }
 
+/**
+ * Extracts the main style path from a package.json file, checking common fields like `sass`, `scss`, `style`, `css`, and `main`.
+ * @param {string} packageJsonPath The path to the package directory containing the package.json file.
+ * @returns {string|null} The main style path if found, or null if not found or if package.json doesn't exist.
+ */
 export function extractMainPathFromPackageJson(packageJsonPath) {
   if (!pathExists(packageJsonPath, 'package.json')) return null
 
@@ -43,6 +64,10 @@ export function extractMainPathFromPackageJson(packageJsonPath) {
   return mainPath
 }
 
+/** Extracts the package name from a given import URL, handling both regular and scoped packages.
+ * @param {string} url The import URL, e.g. `my-pkg/src/styles` or `@scoped/my-pkg/index`.
+ * @returns {string|null} The package name if it can be extracted, or null if not.
+ */
 export function getPackagePath(url) {
   const parts = path.parse(url)
   if (!parts.dir) return null
@@ -54,6 +79,13 @@ export function getPackagePath(url) {
   return dirChunks[0]
 }
 
+/**
+ * Resolves a Sass import URL to an actual file path, supporting include paths and package.json discovery.
+ *
+ * @param {string} url The import URL from the Sass file, e.g. `my-pkg/styles/main.scss` or `@scoped/my-pkg/index`.
+ * @param {string} includePath The base path to resolve from, typically a directory like `node_modules`.
+ * @returns {URL|null} A URL object pointing to the resolved file if found, or null if the file cannot be resolved.
+ */
 export function resolvePath(url, includePath) {
   // check if resolve path, like `node_modules` exists
   const resolvedPath = pathToFileURL(includePath)
