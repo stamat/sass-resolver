@@ -6,6 +6,12 @@ A custom [`FileImporter`](https://sass-lang.com/documentation/js-api/interfaces/
 
 Dart Sass removed the `includePaths` option. This package provides a `FileImporter` that restores that behavior, allowing you to resolve `@use` and `@import` from directories like `node_modules`.
 
+I needed this for my own bundler and static site generator [Poops](https://github.com/stamat/poops). Since legacy API support [`includePaths`](https://sass-lang.com/documentation/js-api/interfaces/legacyfileoptions/#includePaths) didn't work for me at all and I wanted it to work like I was remembering it, I went ahead and wrote it. Might be completely useless by now...
+
+Now that it's complete and supports paths like in good old days, because:
+
+> It's dangerous to go alone! Take this.
+
 ## Install
 
 ```bash
@@ -15,31 +21,31 @@ npm install sass-resolver
 ## Usage
 
 ```js
-import { compile } from 'sass'
-import { sassResolver } from 'sass-resolver'
+import { compile } from "sass";
+import { sassResolver } from "sass-resolver";
 
-const result = compile('src/styles/main.scss', {
-  importers: [sassResolver('node_modules')]
-})
+const result = compile("src/styles/main.scss", {
+  importers: [sassResolver("node_modules")],
+});
 ```
 
 Multiple include paths:
 
 ```js
-const result = compile('src/styles/main.scss', {
-  importers: [sassResolver(['node_modules', 'vendor/styles'])]
-})
+const result = compile("src/styles/main.scss", {
+  importers: [sassResolver(["node_modules", "vendor/styles"])],
+});
 ```
 
 Works with `compileString` too:
 
 ```js
-import { compileString } from 'sass'
-import { sassResolver } from 'sass-resolver'
+import { compileString } from "sass";
+import { sassResolver } from "sass-resolver";
 
 const result = compileString('@use "my-package";', {
-  importers: [sassResolver('node_modules')]
-})
+  importers: [sassResolver("node_modules")],
+});
 ```
 
 ## Resolution algorithm
@@ -54,6 +60,53 @@ Given `@use "my-pkg/core/config"` and an include path of `node_modules`, the res
 6. **Package-relative path** - resolves the path relative to the package entry point defined in `package.json`
 
 The first match is returned as a `file:` URL. If nothing matches across all include paths, `null` is returned and Sass falls through to its default resolution.
+
+## Example
+
+Say you have a package `my-design-system` published to npm:
+
+```
+node_modules/
+└── my-design-system/
+    ├── package.json          { "sass": "src/index.scss" }
+    └── src/
+        ├── index.scss
+        └── core/
+            ├── _config.scss
+            ├── index.scss
+            └── utils/
+                ├── _helpers.scss
+                └── index.scss
+```
+
+With `sassResolver('node_modules')`, these all resolve:
+
+```scss
+// Package entry point (via sass field in package.json)
+@use "my-design-system"; // → src/index.scss
+
+// Directory with index file
+@use "my-design-system/src/core"; // → src/core/index.scss
+@use "my-design-system/src/core/utils"; // → src/core/utils/index.scss
+
+// Direct file (with or without extension)
+@use "my-design-system/src/index"; // → src/index.scss
+@use "my-design-system/src/index.scss"; // → src/index.scss
+
+// Underscore partials
+@use "my-design-system/src/core/config"; // → src/core/_config.scss
+@use "my-design-system/src/core/utils/helpers"; // → src/core/utils/_helpers.scss
+
+// Package-relative paths (resolved relative to package.json entry)
+@use "my-design-system/core/config"; // → src/core/_config.scss
+@use "my-design-system/core/utils/helpers"; // → src/core/utils/_helpers.scss
+
+// If your package is scoped, for instance, same rules apply
+@use "@scope/my-design-system"; // → entry from package.json
+@use "@scope/my-design-system/core/config"; // → resolved via package.json entry
+```
+
+The last two are the key feature — `core/config` doesn't exist at `node_modules/my-design-system/core/config`, but the resolver reads `package.json`, finds the entry point is in `src/`, and resolves relative to that.
 
 ## `package.json` fields
 
