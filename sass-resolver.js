@@ -100,6 +100,21 @@ export function resolvePath(url, includePath) {
   return null
 }
 
+/**
+ * Creates a custom resolver for dart-sass that supports include paths.
+ * @param {string|string[]} includePaths - A string or array of strings representing
+ * the include paths to search for Sass files. For example, `node_modules`.
+ * @returns {Object} An object with a `findFileUrl` method that can be used as a custom importer in dart-sass.
+ * @example
+ * import { sassResolver } from 'sass-resolver'
+ * import { compile } from 'sass'
+ *
+ * const resolver = sassResolver('node_modules')
+ *
+ * compile('src/styles/main.scss', {
+ *  importers: [sassResolver(['node_modules'])]
+ * })
+ */
 export function sassResolver(includePaths) {
   if (!includePaths) throw new Error('sassResolver requires at least one include path')
   if (typeof includePaths === 'string') {

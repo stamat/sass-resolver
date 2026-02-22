@@ -1,0 +1,5 @@
+@use 'my-pkg/core/config';
+
+.test {
+  color: config.$primary-color;
+}

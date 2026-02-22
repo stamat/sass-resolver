@@ -1,6 +1,7 @@
 import { beforeEach, afterEach, it, describe, expect } from '@jest/globals'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import * as sass from 'sass'
 import {
   tryToFindFile,
   extractMainPathFromPackageJson,
@@ -207,5 +208,32 @@ describe('sassResolver', () => {
 
   it('throws when called with an invalid argument', () => {
     expect(() => sassResolver(123)).toThrow()
+  })
+})
+
+describe('dart sass integration', () => {
+  it('compiles a file that @use imports from fake_modules', () => {
+    const entryFile = path.join(FIXTURE_ROOT, 'src', 'entry.scss')
+    const result = sass.compile(entryFile, {
+      importers: [sassResolver(FAKE_MODULES)]
+    })
+    expect(result.css).toContain('.test')
+    expect(result.css).toContain('color: #f00')
+  })
+
+  it('compiles a string that @use imports from fake_modules', () => {
+    const result = sass.compileString('@use "my-pkg/core/config";\n.test { color: config.$primary-color; }', {
+      importers: [sassResolver(FAKE_MODULES)]
+    })
+    expect(result.css).toContain('.test')
+    expect(result.css).toContain('color: #f00')
+  })
+
+  it('throws when importing a nonexistent package', () => {
+    expect(() => {
+      sass.compileString('@use "nonexistent-pkg";', {
+        importers: [sassResolver(FAKE_MODULES)]
+      })
+    }).toThrow()
   })
 })
