@@ -1,1 +1,4 @@
 /* style-field-pkg main */
+.style-field-pkg {
+  display: flex;
+}

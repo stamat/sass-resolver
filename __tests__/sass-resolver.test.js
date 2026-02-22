@@ -229,6 +229,14 @@ describe('dart sass integration', () => {
     expect(result.css).toContain('color: #f00')
   })
 
+  it('compiles a string that @use imports a CSS package via style field', () => {
+    const result = sass.compileString('@use "style-field-pkg";', {
+      importers: [sassResolver(FAKE_MODULES)]
+    })
+    expect(result.css).toContain('.style-field-pkg')
+    expect(result.css).toContain('display: flex')
+  })
+
   it('throws when importing a nonexistent package', () => {
     expect(() => {
       sass.compileString('@use "nonexistent-pkg";', {
