@@ -7,6 +7,6 @@ export function extractMainPathFromPackageJson(packageJsonPath: string): string 
 export function getPackagePath(url: string): string | null;
 export function resolvePath(url: string, includePath: string): URL | null;
 
-export function sassResolver(includePaths: string | string[]): FileImporter<'sync'>;
+export function sassPathResolver(includePaths: string | string[]): FileImporter<'sync'>;
 
-export default sassResolver;
+export default sassPathResolver;

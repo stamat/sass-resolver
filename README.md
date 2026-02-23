@@ -1,4 +1,4 @@
-# sass-resolver
+# sass-path-resolver
 
 A custom [`FileImporter`](https://sass-lang.com/documentation/js-api/interfaces/fileimporter/) for Dart Sass that adds include path resolution, similar to the deprecated `includePaths` option.
 
@@ -17,17 +17,17 @@ P.S. I see now `pkg:` prefixed node imports exist since exactly a year ago... we
 ## Install
 
 ```bash
-npm install sass-resolver
+npm install sass-path-resolver
 ```
 
 ## Usage
 
 ```js
 import { compile } from "sass";
-import { sassResolver } from "sass-resolver";
+import { sassPathResolver } from "sass-path-resolver";
 
 const result = compile("src/styles/main.scss", {
-  importers: [sassResolver("node_modules")],
+  importers: [sassPathResolver("node_modules")],
 });
 ```
 
@@ -35,7 +35,7 @@ Multiple include paths:
 
 ```js
 const result = compile("src/styles/main.scss", {
-  importers: [sassResolver(["node_modules", "vendor/styles"])],
+  importers: [sassPathResolver(["node_modules", "vendor/styles"])],
 });
 ```
 
@@ -43,10 +43,10 @@ Works with `compileString` too:
 
 ```js
 import { compileString } from "sass";
-import { sassResolver } from "sass-resolver";
+import { sassPathResolver } from "sass-path-resolver";
 
 const result = compileString('@use "my-package";', {
-  importers: [sassResolver("node_modules")],
+  importers: [sassPathResolver("node_modules")],
 });
 ```
 
@@ -81,7 +81,7 @@ node_modules/
                 └── index.scss
 ```
 
-With `sassResolver('node_modules')`, these all resolve:
+With `sassPathResolver('node_modules')`, these all resolve:
 
 ```scss
 // Package entry point (via sass field in package.json)
@@ -122,7 +122,7 @@ When resolving a package root (e.g. `@use "my-pkg"`), the resolver reads `packag
 
 ## API
 
-### `sassResolver(includePaths)`
+### `sassPathResolver(includePaths)`
 
 Returns a Dart Sass [`FileImporter`](https://sass-lang.com/documentation/js-api/interfaces/fileimporter/) object.
 

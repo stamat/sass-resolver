@@ -138,21 +138,21 @@ export function resolvePath(url, includePath) {
  * the include paths to search for Sass files. For example, `node_modules`.
  * @returns {Object} An object with a `findFileUrl` method that can be used as a custom importer in dart-sass.
  * @example
- * import { sassResolver } from 'sass-resolver'
+ * import { sassPathResolver } from 'sass-path-resolver'
  * import { compile } from 'sass'
  *
- * const resolver = sassResolver('node_modules')
+ * const resolver = sassPathResolver('node_modules')
  *
  * compile('src/styles/main.scss', {
- *  importers: [sassResolver(['node_modules'])]
+ *  importers: [sassPathResolver(['node_modules'])]
  * })
  */
-export function sassResolver(includePaths) {
-  if (!includePaths) throw new Error('sassResolver requires at least one include path')
+export function sassPathResolver(includePaths) {
+  if (!includePaths) throw new Error('sassPathResolver requires at least one include path')
   if (typeof includePaths === 'string') {
     includePaths = [includePaths]
   }
-  if (!Array.isArray(includePaths)) throw new Error('sassResolver expects a string or array of strings')
+  if (!Array.isArray(includePaths)) throw new Error('sassPathResolver expects a string or array of strings')
 
   return {
     findFileUrl(url) {
@@ -165,4 +165,4 @@ export function sassResolver(includePaths) {
   }
 }
 
-export default sassResolver
+export default sassPathResolver

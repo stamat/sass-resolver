@@ -1,5 +1,5 @@
 {
-  "name": "sass-resolver",
+  "name": "sass-path-resolver",
   "description": "A custom FileImporter for Dart Sass that adds include path resolution, similar to the deprecated includePaths option.",
   "version": "1.0.0",
   "license": "MIT",
@@ -8,14 +8,14 @@
   "types": "sass-resolver.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stamat/sass-resolver.git"
+    "url": "git+https://github.com/stamat/sass-path-resolver.git"
   },
   "files": [
     "sass-resolver.js",
     "sass-resolver.d.ts"
   ],
   "author": "Stamat <@stamat> (http://stamat.info)",
-  "homepage": "https://github.com/stamat/sass-resolver",
+  "homepage": "https://github.com/stamat/sass-path-resolver",
   "private": false,
   "keywords": [
     "sass",

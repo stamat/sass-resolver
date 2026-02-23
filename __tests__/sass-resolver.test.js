@@ -7,8 +7,8 @@ import {
   extractMainPathFromPackageJson,
   getPackagePath,
   resolvePath,
-  sassResolver
-} from '../sass-resolver.js'
+  sassPathResolver,
+} from '../sass-path-resolver.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const FIXTURE_ROOT = path.join(__dirname, 'fixtures')
@@ -171,43 +171,43 @@ describe('resolvePath', () => {
   })
 })
 
-describe('sassResolver', () => {
+describe('sassPathResolver', () => {
   it('returns an object with a findFileUrl method', () => {
-    const importer = sassResolver(FAKE_MODULES)
+    const importer = sassPathResolver(FAKE_MODULES)
     expect(typeof importer.findFileUrl).toBe('function')
   })
 
   it('resolves a package with a single string path', () => {
-    const importer = sassResolver(FAKE_MODULES)
+    const importer = sassPathResolver(FAKE_MODULES)
     const result = importer.findFileUrl('my-pkg')
     expect(result).not.toBeNull()
     expect(result.pathname).toContain(path.join('my-pkg', 'src', 'index.scss'))
   })
 
   it('resolves a package with an array of paths', () => {
-    const importer = sassResolver(['/nonexistent/path', FAKE_MODULES])
+    const importer = sassPathResolver(['/nonexistent/path', FAKE_MODULES])
     const result = importer.findFileUrl('my-pkg')
     expect(result).not.toBeNull()
     expect(result.pathname).toContain(path.join('my-pkg', 'src', 'index.scss'))
   })
 
   it('returns null for unresolvable imports', () => {
-    const importer = sassResolver(FAKE_MODULES)
+    const importer = sassPathResolver(FAKE_MODULES)
     const result = importer.findFileUrl('nonexistent-pkg')
     expect(result).toBeNull()
   })
 
   it('returns null for any URL when given an empty array', () => {
-    const importer = sassResolver([])
+    const importer = sassPathResolver([])
     expect(importer.findFileUrl('my-pkg')).toBeNull()
   })
 
   it('throws when called without arguments', () => {
-    expect(() => sassResolver()).toThrow()
+    expect(() => sassPathResolver()).toThrow()
   })
 
   it('throws when called with an invalid argument', () => {
-    expect(() => sassResolver(123)).toThrow()
+    expect(() => sassPathResolver(123)).toThrow()
   })
 })
 
@@ -215,7 +215,7 @@ describe('dart sass integration', () => {
   it('compiles a file that @use imports from fake_modules', () => {
     const entryFile = path.join(FIXTURE_ROOT, 'src', 'entry.scss')
     const result = sass.compile(entryFile, {
-      importers: [sassResolver(FAKE_MODULES)]
+      importers: [sassPathResolver(FAKE_MODULES)]
     })
     expect(result.css).toContain('.test')
     expect(result.css).toContain('color: #f00')
@@ -223,7 +223,7 @@ describe('dart sass integration', () => {
 
   it('compiles a string that @use imports from fake_modules', () => {
     const result = sass.compileString('@use "my-pkg/core/config";\n.test { color: config.$primary-color; }', {
-      importers: [sassResolver(FAKE_MODULES)]
+      importers: [sassPathResolver(FAKE_MODULES)]
     })
     expect(result.css).toContain('.test')
     expect(result.css).toContain('color: #f00')
@@ -231,7 +231,7 @@ describe('dart sass integration', () => {
 
   it('compiles a string that @use imports a CSS package via style field', () => {
     const result = sass.compileString('@use "style-field-pkg";', {
-      importers: [sassResolver(FAKE_MODULES)]
+      importers: [sassPathResolver(FAKE_MODULES)]
     })
     expect(result.css).toContain('.style-field-pkg')
     expect(result.css).toContain('display: flex')
@@ -240,7 +240,7 @@ describe('dart sass integration', () => {
   it('throws when importing a nonexistent package', () => {
     expect(() => {
       sass.compileString('@use "nonexistent-pkg";', {
-        importers: [sassResolver(FAKE_MODULES)]
+        importers: [sassPathResolver(FAKE_MODULES)]
       })
     }).toThrow()
   })
